@@ -91,7 +91,7 @@ function averageOrientation() {
 
   document.getElementById(
     "orientation_average"
-  ).innerHTML = `§ average Alpha Delta: ${averageAlphaDeltas} § average Beta Delta: ${averageBetaDeltas} § average Gamma Delta: ${averageGammaDeltas}`;
+  ).innerHTML = `${averageAlphaDeltas},${averageBetaDeltas},${averageGammaDeltas}`;
 
   orientationArray = [];
   deltaArray = [];
