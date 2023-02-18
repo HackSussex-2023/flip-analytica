@@ -1,5 +1,7 @@
 var orientationArray = [];
 var deltaTrackerArray = [];
+var flipOrientationArray = [];
+var flipDeltaArray = [];
 var flipping = false;
 var captureWindow = 11;
 var deltaThreshold = 8;
@@ -78,9 +80,15 @@ function flip_or_no_flip() {
     ) {
       flipping = true;
       document.body.style.backgroundColor = "green";
+      flipOrientationArray.push(sliced);
+      flipDeltaArray.push(averageDeltas);
     } else {
       flipping = false;
       document.body.style.backgroundColor = "red";
+      document.getElementById("flipping_length").innerHTML =
+        flipOrientationArray.length;
+      // document.getElementById("flipping_array").innerHTML =
+      //   flipOrientationArray;
     }
   }
 }
