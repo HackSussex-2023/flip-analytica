@@ -3,7 +3,7 @@ var deltaTrackerArray = [];
 var flipping = false;
 var captureWindow = 11;
 var deltaThreshold = 8;
-var averageSpeed = 0;
+var averageSpeed = 0.1;
 var averageSpeedThreshold = 3;
 
 function addOrientationToArray(event) {
@@ -134,5 +134,8 @@ function handleMotion(event) {
   updateFieldIfNotNull("Accelerometer_z", event.acceleration.z);
 
   averageSpeed =
-    (event.acceleration.x + event.acceleration.y + event.acceleration.z) / 3;
+    (Math.abs(event.acceleration.x) +
+      Math.abs(event.acceleration.y) +
+      Math.abs(event.acceleration.z)) /
+    3;
 }
