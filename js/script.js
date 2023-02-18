@@ -1,28 +1,24 @@
-function handlePermission() {
-  navigator.permissions.query({ name: "geolocation" }).then(function (result) {
-    if (result.state == "granted") {
-      report(result.state);
-    } else if (result.state == "prompt") {
-      report(result.state);
-      navigator.geolocation.getCurrentPosition(
-        revealPosition,
-        positionDenied,
-        geoSettings
-      );
-    } else if (result.state == "denied") {
-      report(result.state);
-    }
-    result.onchange = function () {
-      report(result.state);
-    };
-  });
+function getGeoLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
 }
 
-function report(state) {
-  console.log("Permission " + state);
-}
+function showPosition(position) {
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+  const altitude = position.coords.altitude;
+  const accuracy = position.coords.accuracy;
+  const altitudeAccuracy = position.coords.altitudeAccuracy;
+  const heading = position.coords.height;
+  const speed = position.coords.speed;
+  const timestamp = position.timestamp;
 
-handlePermission();
+  // work with this information however you'd like!
+  document.getElementById("demo").innerHTML = altitude;
+}
 
 function onClick() {
   if (typeof DeviceMotionEvent.requestPermission === "function") {
@@ -41,6 +37,8 @@ function onClick() {
     window.addEventListener("devicemotion", handleOrientation);
   }
 }
+
+// window.addEventListener("devicemotion", handleOrientation);
 
 calibratedDiv = document.getElementById("calibrated");
 posDiv = document.getElementById("pos");
