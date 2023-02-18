@@ -7,6 +7,7 @@ var captureWindow = 11;
 var deltaThreshold = 8;
 var averageSpeed = 0.1;
 var averageSpeedThreshold = 3;
+var millisecondsStart = 0;
 
 function addOrientationToArray(event) {
   // console.log(event);
@@ -78,19 +79,42 @@ function flip_or_no_flip() {
       combinedDeltaAverage > deltaThreshold &&
       averageSpeed > averageSpeedThreshold
     ) {
-      flipping = true;
       document.body.style.backgroundColor = "green";
       flipOrientationArray.push(sliced);
       flipDeltaArray.push(averageDeltas);
+      if (!flipping) {
+        let d = new Date();
+        millisecondsStart = d.getMilliseconds();
+      }
+      flipping = true;
     } else {
-      flipping = false;
       document.body.style.backgroundColor = "red";
       document.getElementById("flipping_length").innerHTML =
         flipOrientationArray.length;
       // document.getElementById("flipping_array").innerHTML =
       //   flipOrientationArray;
+      if (flipping) {
+        let d = new Date();
+        console.log("flipping stopped");
+        let millisecondsStop = d.getMilliseconds();
+        let millisecondsDifference = millisecondsStop - millisecondsStart;
+        document.getElementById("flipping_time").innerHTML =
+          millisecondsDifference;
+        isFaceUp = getFaceUp(orientationArray[orientationArray.length - 1]);
+        document.getElementById("flipping_faceup").innerHTML = isFaceUp;
+      }
+      flipping = false;
     }
   }
+}
+
+function getFaceUp(orientationDict) {
+  return (
+    orientationDict.beta > -45 &&
+    orientationDict.beta < 45 &&
+    orientationDict.gamma > -45 &&
+    orientationDict.gamma < 45
+  );
 }
 
 function averageOrientation(array) {
