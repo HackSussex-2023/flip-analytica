@@ -2,6 +2,7 @@ function handleOrientation(event) {
   updateFieldIfNotNull("Orientation_a", event.alpha);
   updateFieldIfNotNull("Orientation_b", event.beta);
   updateFieldIfNotNull("Orientation_g", event.gamma);
+  addOrientationToArray(event);
   incrementEventCount();
 }
 
@@ -42,6 +43,60 @@ function handleMotion(event) {
   incrementEventCount();
 }
 
+var orientationArray = [];
+
+function addOrientationToArray(event) {
+  // console.log(event);
+  orientationArray.push({
+    alpha: event.alpha,
+    beta: event.beta,
+    gamma: event.gamma,
+  });
+  // console.log(orientationArray);
+}
+
+function averageOrientation() {
+  let sumAlphaDeltas = 0;
+  let sumBetaDeltas = 0;
+  let sumGammaDeltas = 0;
+
+  let deltaArray = [];
+
+  for (let i = 1; i < orientationArray.length; i++) {
+    let deltaAlpha = Math.abs(
+      Math.abs(orientationArray[i].alpha) -
+        Math.abs(orientationArray[i - 1].alpha)
+    );
+    let deltaBeta = Math.abs(
+      Math.abs(orientationArray[i].beta) -
+        Math.abs(orientationArray[i - 1].beta)
+    );
+    let deltaGamma = Math.abs(
+      Math.abs(orientationArray[i].gamma) -
+        Math.abs(orientationArray[i - 1].gamma)
+    );
+
+    deltaArray.push({ alpha: deltaAlpha, beta: deltaBeta, gamma: deltaGamma });
+  }
+
+  deltaArray.forEach((element) => {
+    sumAlphaDeltas += element.alpha;
+    sumBetaDeltas += element.beta;
+    sumGammaDeltas += element.gamma;
+  });
+
+  let averageAlphaDeltas = sumAlphaDeltas / deltaArray.length;
+  let averageBetaDeltas = sumBetaDeltas / deltaArray.length;
+  let averageGammaDeltas = sumGammaDeltas / deltaArray.length;
+
+  document.getElementById(
+    "orientation_average"
+  ).innerHTML = `§ average Alpha Delta: ${averageAlphaDeltas} § average Beta Delta: ${averageBetaDeltas} § average Gamma Delta: ${averageGammaDeltas}`;
+
+  orientationArray = [];
+  deltaArray = [];
+}
+
 let is_running = false;
 let demo_button = document.getElementById("start_demo");
 demo_button.onclick = function (e) {
@@ -56,6 +111,7 @@ demo_button.onclick = function (e) {
   }
 
   if (is_running) {
+    averageOrientation();
     window.removeEventListener("devicemotion", handleMotion);
     window.removeEventListener("deviceorientation", handleOrientation);
     demo_button.innerHTML = "Start demo";
@@ -63,6 +119,8 @@ demo_button.onclick = function (e) {
     demo_button.classList.remove("btn-danger");
     is_running = false;
   } else {
+    let counterElement = document.getElementById("num-observed-events");
+    counterElement.innerHTML = 0;
     window.addEventListener("devicemotion", handleMotion);
     window.addEventListener("deviceorientation", handleOrientation);
     document.getElementById("start_demo").innerHTML = "Stop demo";

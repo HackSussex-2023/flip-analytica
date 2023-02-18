@@ -18,13 +18,6 @@
     <div id="calibrated"></div>
     <div id="pos"></div> -->
     <div class="p-3 mb-2 bg-secondary" id="demo-div">
-      <a
-        id="start_demo"
-        class="btn btn-lg btn-success py-1"
-        href="#"
-        role="button"
-        >Start the demo</a
-      >
       <p style="margin-top: 1rem">
         Num. of datapoints:
         <span class="badge badge-warning" id="num-observed-events">0</span>
@@ -80,6 +73,16 @@
         <li>Z-axis: <span id="Gyroscope_z">0</span><span>°/s</span></li>
       </ul>
     </div>
+    <button
+      id="start_demo"
+      class="btn btn-lg btn-success py-1"
+      href="#"
+      role="button"
+      style="width: 100%; height: 100vh"
+    >
+      Start the demo
+    </button>
+    <div id="orientation_average"></div>
     <script src="js/script.js" async defer></script>
   </body>
 </html>
