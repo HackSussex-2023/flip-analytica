@@ -1,3 +1,29 @@
+function handlePermission() {
+  navigator.permissions.query({ name: "geolocation" }).then(function (result) {
+    if (result.state == "granted") {
+      report(result.state);
+    } else if (result.state == "prompt") {
+      report(result.state);
+      navigator.geolocation.getCurrentPosition(
+        revealPosition,
+        positionDenied,
+        geoSettings
+      );
+    } else if (result.state == "denied") {
+      report(result.state);
+    }
+    result.onchange = function () {
+      report(result.state);
+    };
+  });
+}
+
+function report(state) {
+  console.log("Permission " + state);
+}
+
+handlePermission();
+
 function onClick() {
   if (typeof DeviceMotionEvent.requestPermission === "function") {
     // Handle iOS 13+ devices.
@@ -15,8 +41,6 @@ function onClick() {
     window.addEventListener("devicemotion", handleOrientation);
   }
 }
-
-window.addEventListener("deviceorientation", handleOrientation);
 
 calibratedDiv = document.getElementById("calibrated");
 posDiv = document.getElementById("pos");
