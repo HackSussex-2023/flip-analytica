@@ -2,7 +2,9 @@ var orientationArray = [];
 var deltaTrackerArray = [];
 var flipping = false;
 var captureWindow = 11;
-var threshold = 7;
+var threshold = 8;
+var averageSpeed = 0;
+var averageSpeedThreshold = 3;
 
 function addOrientationToArray(event) {
   // console.log(event);
@@ -33,11 +35,13 @@ demo_button.onclick = function (e) {
       "orientation_average"
     ).innerHTML = `${averageDeltas.averageAlphaDeltas},${averageDeltas.averageBetaDeltas},${averageDeltas.averageGammaDeltas}`;
     window.removeEventListener("deviceorientation", handleOrientation);
+    window.removeEventListener("devicemotion", handleMotion);
     demo_button.innerHTML = "Start demo";
     demo_button.classList.add("btn-success");
     demo_button.classList.remove("btn-danger");
     is_running = false;
   } else {
+    window.addEventListener("devicemotion", handleMotion);
     window.addEventListener("deviceorientation", handleOrientation);
     document.getElementById("start_demo").innerHTML = "Stop demo";
     demo_button.classList.remove("btn-success");
@@ -68,7 +72,10 @@ function flip_or_no_flip() {
         averageDeltas.averageGammaDeltas) /
       3;
 
-    if (combinedDeltaAverage > threshold) {
+    if (
+      combinedDeltaAverage > threshold &&
+      averageSpeed > averageSpeedThreshold
+    ) {
       flipping = true;
       document.body.style.backgroundColor = "green";
     } else {
@@ -119,4 +126,13 @@ function averageOrientation(array) {
 function updateFieldIfNotNull(fieldName, value, precision = 10) {
   if (value != null)
     document.getElementById(fieldName).innerHTML = value.toFixed(precision);
+}
+
+function handleMotion(event) {
+  updateFieldIfNotNull("Accelerometer_x", event.acceleration.x);
+  updateFieldIfNotNull("Accelerometer_y", event.acceleration.y);
+  updateFieldIfNotNull("Accelerometer_z", event.acceleration.z);
+
+  averageSpeed =
+    (event.acceleration.x + event.acceleration.y + event.acceleration.z) / 3;
 }
