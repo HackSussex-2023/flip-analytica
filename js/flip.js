@@ -2,7 +2,7 @@ var orientationArray = [];
 var deltaTrackerArray = [];
 var flipping = false;
 var captureWindow = 11;
-var threshold = 8;
+var deltaThreshold = 8;
 var averageSpeed = 0;
 var averageSpeedThreshold = 3;
 
@@ -73,7 +73,7 @@ function flip_or_no_flip() {
       3;
 
     if (
-      combinedDeltaAverage > threshold &&
+      combinedDeltaAverage > deltaThreshold &&
       averageSpeed > averageSpeedThreshold
     ) {
       flipping = true;
