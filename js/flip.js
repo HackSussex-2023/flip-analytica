@@ -3,8 +3,10 @@ var deltaTrackerArray = [];
 var flipping = false;
 var captureWindow = 11;
 var deltaThreshold = 8;
-var averageSpeed = 0.1;
-var averageSpeedThreshold = 3;
+var averageAccel = 0.1;
+var averageAccelThreshold = 3;
+var flipStartIndex = null;
+var flippingOrientationSlice = null;
 
 function addOrientationToArray(event) {
   orientationArray.push({
@@ -55,12 +57,12 @@ function handleOrientation(event) {
 
 function flip_or_no_flip() {
   if (orientationArray.length > captureWindow) {
-    let sliced = orientationArray.slice(
+    let windowOrientationSlice = orientationArray.slice(
       orientationArray.length - captureWindow,
       orientationArray.length
     );
 
-    let averageDeltas = averageOrientation(sliced);
+    let averageDeltas = averageOrientation(windowOrientationSlice);
     let combinedDeltaAverage =
       (averageDeltas.averageAlphaDeltas +
         averageDeltas.averageBetaDeltas +
@@ -69,15 +71,32 @@ function flip_or_no_flip() {
 
     if (
       combinedDeltaAverage > deltaThreshold &&
-      averageSpeed > averageSpeedThreshold
+      averageAccel > averageAccelThreshold
     ) {
-      flipping = true;
       document.body.style.backgroundColor = "green";
+      if (!flipping) {
+        startFlip();
+      }
+      flipping = true;
     } else {
-      flipping = false;
       document.body.style.backgroundColor = "red";
+      if (flipping) {
+        stopFlip();
+      }
+      flipping = false;
     }
   }
+}
+
+function startFlip() {
+  flipStartIndex = orientationArray.length;
+}
+
+function stopFlip() {
+  flippingOrientationSlice = orientationArray.slice(flipStartIndex, -1);
+
+  document.getElementById("flip_length").innerHTML =
+    flippingOrientationSlice.length;
 }
 
 function averageOrientation(array) {
@@ -128,7 +147,7 @@ function handleMotion(event) {
   updateFieldIfNotNull("Accelerometer_y", event.acceleration.y);
   updateFieldIfNotNull("Accelerometer_z", event.acceleration.z);
 
-  averageSpeed =
+  averageAccel =
     (Math.abs(event.acceleration.x) +
       Math.abs(event.acceleration.y) +
       Math.abs(event.acceleration.z)) /
