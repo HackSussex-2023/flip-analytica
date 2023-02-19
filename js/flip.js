@@ -25,6 +25,8 @@ function addOrientationToArray(event) {
 let is_running = false;
 let demo_button = document.getElementById("start_demo");
 demo_button.onclick = function (e) {
+  let d = new Date();
+  millisecondsStart = d.getMilliseconds();
   e.preventDefault();
 
   // Request permission for iOS 13+ devices
@@ -134,7 +136,7 @@ function flip_or_no_flip() {
         let millisecondsDifference = millisecondsStop - millisecondsStart;
         document.getElementById("flipping_time").innerHTML =
           millisecondsDifference;
-        millisecondsStart = 0;
+        millisecondsStart = d.getMilliseconds();
 
         isFaceUp = getFaceUp(orientationArray[orientationArray.length - 1]);
         document.getElementById("flipping_faceup").innerHTML = isFaceUp;
