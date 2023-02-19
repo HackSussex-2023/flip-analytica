@@ -31,12 +31,6 @@ demo_button.onclick = function (e) {
   }
 
   if (is_running) {
-    averageDeltas = averageOrientation(orientationArray);
-
-    document.getElementById(
-      "orientation_average"
-    ).innerHTML = `${averageDeltas.averageAlphaDeltas},${averageDeltas.averageBetaDeltas},${averageDeltas.averageGammaDeltas}`;
-    window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener("devicemotion", handleMotion);
     demo_button.innerHTML = "Start demo";
     is_running = false;
