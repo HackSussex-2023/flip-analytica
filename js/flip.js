@@ -7,6 +7,7 @@ var averageAccel = 0.1;
 var averageAccelThreshold = 3;
 var flipStartIndex = null;
 var flippingOrientationSlice = null;
+var flipTimeStart = null;
 
 function addOrientationToArray(event) {
   orientationArray.push({
@@ -90,10 +91,21 @@ function flip_or_no_flip() {
 
 function startFlip() {
   flipStartIndex = orientationArray.length;
+  flipTimeStart = new Date().getTime();
 }
 
 function stopFlip() {
   flippingOrientationSlice = orientationArray.slice(flipStartIndex, -1);
+  let flipTimeEnd = new Date().getTime();
+  let flipTime =
+    parseInt(String(flipTimeEnd)) - parseInt(String(flipTimeStart));
+
+  document.getElementById("flip_start").innerHTML = flipStartIndex;
+  document.getElementById("flip_end").innerHTML = orientationArray.length;
+  document.getElementById("flip_time").innerHTML = flipTime;
+
+  flipTimeEnd = 0;
+  flipTimeStart = 0;
 
   document.getElementById("flip_length").innerHTML =
     flippingOrientationSlice.length;
