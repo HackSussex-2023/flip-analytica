@@ -19,10 +19,10 @@ function addOrientationToArray(event) {
 }
 
 function stopRunning() {
-  window.removeEventListener("deviceorientation", handleOrientation);
-  window.removeEventListener("devicemotion", handleMotion);
-  demo_button.innerHTML = "Start demo";
-  is_running = false;
+  window.addEventListener("devicemotion", handleMotion);
+  window.addEventListener("deviceorientation", handleOrientation);
+  document.getElementById("start_demo").innerHTML = "Stop demo";
+  is_running = true;
 }
 
 let is_running = false;
@@ -43,7 +43,7 @@ demo_button.onclick = function (e) {
     demo_button.innerHTML = "Start demo";
     is_running = false;
   } else {
-    startRunning();
+    stopRunning();
   }
 };
 
