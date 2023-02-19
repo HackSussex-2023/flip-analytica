@@ -46,7 +46,7 @@ function generateChallenge() {
     challengeText = "Land a " + challengeTarget + "-second flip";
   } else if (currentChallenge == 1) {
     challengeTarget = (Math.random() * (sMax - sMin) + sMin).toFixed(2);
-    challengeText = "Hit a max speed of " + challengeTarget;
+    challengeText = "Hit a min speed of " + challengeTarget;
   } else if (currentChallenge == 2) {
     challengeTarget = (Math.random() * (rMax - rMin) + rMin).toFixed(2);
     challengeText = "Hit " + challengeTarget + " rotations in one flip";
@@ -66,8 +66,8 @@ function challengeJudge(airTime, speed, rotations) {
     if (rotations >= challengeTarget) {
       return true;
     }
-    return false;
   }
+  return false;
 }
 
 function resetVariables() {
@@ -139,13 +139,13 @@ function flip_or_no_flip() {
       combinedDeltaAverage > deltaThreshold &&
       averageAccel > averageAccelThreshold
     ) {
-      // document.body.style.backgroundColor = "green";
+      document.body.style.backgroundColor = "#88ff88";
       if (!flipping) {
         startFlip();
       }
       flipping = true;
     } else {
-      // document.body.style.backgroundColor = "red";
+      document.body.style.backgroundColor = "#ff8888";
       if (flipping) {
         stopFlip();
       }
