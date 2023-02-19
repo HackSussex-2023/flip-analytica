@@ -5,9 +5,10 @@ var flipDeltaArray = [];
 var flipping = false;
 var captureWindow = 11;
 var deltaThreshold = 8;
-var averageSpeed = 0.1;
-var averageSpeedThreshold = 3;
+var averageAcceleration = 0.2;
+var averageAccelerationThreshold = 3;
 var millisecondsStart = 0;
+var speedArray = [];
 
 function addOrientationToArray(event) {
   // console.log(event);
@@ -63,12 +64,17 @@ function handleOrientation(event) {
 
 function flip_or_no_flip() {
   if (orientationArray.length > captureWindow) {
-    let sliced = orientationArray.slice(
+    let slicedOrientation = orientationArray.slice(
       orientationArray.length - captureWindow,
       orientationArray.length
     );
 
-    let averageDeltas = averageOrientation(sliced);
+    let slicedSpeed = speedArray.slice(
+      speedArray.length - captureWindow,
+      speedArray.length
+    );
+
+    let averageDeltas = averageOrientation(slicedOrientation);
     let combinedDeltaAverage =
       (averageDeltas.averageAlphaDeltas +
         averageDeltas.averageBetaDeltas +
@@ -77,10 +83,10 @@ function flip_or_no_flip() {
 
     if (
       combinedDeltaAverage > deltaThreshold &&
-      averageSpeed > averageSpeedThreshold
+      averageAcceleration > averageAccelerationThreshold
     ) {
       document.body.style.backgroundColor = "green";
-      flipOrientationArray.push(sliced);
+      flipOrientationArray.push(slicedOrientation);
       flipDeltaArray.push(averageDeltas);
       if (!flipping) {
         let d = new Date();
@@ -102,10 +108,60 @@ function flip_or_no_flip() {
           millisecondsDifference;
         isFaceUp = getFaceUp(orientationArray[orientationArray.length - 1]);
         document.getElementById("flipping_faceup").innerHTML = isFaceUp;
+        maxSpeed = getMaxSpeed(slicedSpeed);
+        document.getElementById("flipping_maxspeed").innerHTML = maxSpeed;
+        averageSpeed = getAverageSpeed(slicedSpeed);
+        document.getElementById("flipping_averagespeed").innerHTML =
+          averageSpeed.averageCombinedSpeed;
       }
       flipping = false;
     }
   }
+}
+
+function getAverageSpeed(array) {
+  let sumAlphaSpeed = 0;
+  let sumBetaSpeed = 0;
+  let sumGammaSpeed = 0;
+
+  array.forEach((element) => {
+    sumAlphaSpeed += element.alpha;
+    sumBetaSpeed += element.beta;
+    sumGammaSpeed += element.gamma;
+  });
+
+  let averageAlphaSpeed = sumAlphaSpeed / array.length;
+  let averageBetaSpeed = sumBetaSpeed / array.length;
+  let averageGammaSpeed = sumGammaSpeed / array.length;
+  let averageCombinedSpeed = Math.sqrt(
+    Math.pow(averageAlphaSpeed, 2) +
+      Math.pow(averageBetaSpeed, 2) +
+      Math.pow(averageGammaSpeed, 2)
+  );
+
+  return {
+    averageAlphaSpeed: averageAlphaSpeed,
+    averageBetaSpeed: averageBetaSpeed,
+    averageGammaSpeed: averageGammaSpeed,
+    averageCombinedSpeed: averageCombinedSpeed,
+  };
+}
+
+function getMaxSpeed(array) {
+  let maxCombinedSpeed = 0;
+
+  array.forEach((element) => {
+    let combinedSpeed = Math.sqrt(
+      Math.pow(element.alpha, 2) +
+        Math.pow(element.beta, 2) +
+        Math.pow(element.gamma, 2)
+    );
+
+    if (combinedSpeed > maxCombinedSpeed) {
+      maxCombinedSpeed = combinedSpeed;
+    }
+  });
+  return maxCombinedSpeed;
 }
 
 function getFaceUp(orientationDict) {
@@ -165,9 +221,15 @@ function handleMotion(event) {
   updateFieldIfNotNull("Accelerometer_y", event.acceleration.y);
   updateFieldIfNotNull("Accelerometer_z", event.acceleration.z);
 
-  averageSpeed =
+  averageAcceleration =
     (Math.abs(event.acceleration.x) +
       Math.abs(event.acceleration.y) +
       Math.abs(event.acceleration.z)) /
     3;
+
+  speedArray.push({
+    alpha: event.rotationRate.alpha,
+    beta: event.rotationRate.beta,
+    gamma: event.rotationRate.gamma,
+  });
 }
