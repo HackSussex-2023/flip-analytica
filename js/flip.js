@@ -1,6 +1,9 @@
+import * as THREE from "three";
+const scene = new THREE.Scene();
+
 var orientationArray = [];
-var deltaTrackerArray = [];
 var speedArray = [];
+var deltaArray = [];
 var flipping = false;
 var captureWindow = 16;
 var deltaThreshold = 8;
@@ -9,8 +12,20 @@ var averageAccelThreshold = 2;
 var flipStartIndex = null;
 var flippingOrientationSlice = null;
 var flippingSpeedSlice = [];
+var flippingDeltaSlice = [];
 var flipTimeStart = null;
 var sampleRate = 60;
+
+function resetVariables() {
+  orientationArray = [];
+  speedArray = [];
+  deltaArray = [];
+  flipStartIndex = null;
+  flippingOrientationSlice = null;
+  flippingSpeedSlice = [];
+  flippingDeltaSlice = [];
+  flipTimeStart = null;
+}
 
 function addOrientationToArray(event) {
   orientationArray.push({
@@ -95,6 +110,7 @@ function startFlip() {
 function stopFlip() {
   flippingOrientationSlice = orientationArray.slice(flipStartIndex, -1);
   flippingSpeedSlice = speedArray.slice(flipStartIndex, -1);
+  flippingDeltaSlice = deltaArray.slice(flipStartIndex, -1);
 
   document.getElementById("flip_length").innerHTML =
     flippingOrientationSlice.length;
@@ -103,10 +119,14 @@ function stopFlip() {
 
   document.getElementById("flip_max_speed").innerHTML = getMaxSpeed();
 
+  document.getElementById("flip_num_rotations").innerHTML = getNumRotations();
+
   window.removeEventListener("deviceorientation", handleOrientation);
   window.removeEventListener("devicemotion", handleMotion);
   demo_button.innerHTML = "Start demo";
   is_running = false;
+
+  resetVariables();
 }
 
 function getMaxSpeed() {
@@ -131,7 +151,7 @@ function averageOrientation(array) {
   let sumBetaDeltas = 0;
   let sumGammaDeltas = 0;
 
-  let deltaArray = [];
+  let localDeltaArray = [];
 
   for (let i = 1; i < array.length; i++) {
     let deltaAlpha = Math.abs(
@@ -144,18 +164,28 @@ function averageOrientation(array) {
       Math.abs(array[i].gamma) - Math.abs(array[i - 1].gamma)
     );
 
-    deltaArray.push({ alpha: deltaAlpha, beta: deltaBeta, gamma: deltaGamma });
+    localDeltaArray.push({
+      alpha: deltaAlpha,
+      beta: deltaBeta,
+      gamma: deltaGamma,
+    });
+
+    deltaArray.push({
+      alpha: deltaAlpha,
+      beta: deltaBeta,
+      gamma: deltaGamma,
+    });
   }
 
-  deltaArray.forEach((element) => {
+  localDeltaArray.forEach((element) => {
     sumAlphaDeltas += element.alpha;
     sumBetaDeltas += element.beta;
     sumGammaDeltas += element.gamma;
   });
 
-  let averageAlphaDeltas = sumAlphaDeltas / deltaArray.length;
-  let averageBetaDeltas = sumBetaDeltas / deltaArray.length;
-  let averageGammaDeltas = sumGammaDeltas / deltaArray.length;
+  let averageAlphaDeltas = sumAlphaDeltas / localDeltaArray.length;
+  let averageBetaDeltas = sumBetaDeltas / localDeltaArray.length;
+  let averageGammaDeltas = sumGammaDeltas / localDeltaArray.length;
 
   return {
     averageAlphaDeltas: averageAlphaDeltas,

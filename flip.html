@@ -13,6 +13,20 @@
     <link rel="stylesheet" href="" />
   </head>
   <body>
+    <script
+      async
+      src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+    ></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.149.0/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script></script>
     <p>Orientation_a: <span id="Orientation_a"></span></p>
     <p>Orientation_b: <span id="Orientation_b"></span></p>
     <p>Orientation_g: <span id="Orientation_g"></span></p>
@@ -26,6 +40,7 @@
     <p>flip_length: <span id="flip_length"></span></p>
     <p>flip_time: <span id="flip_time"></span></p>
     <p>flip_max_speed: <span id="flip_max_speed"></span></p>
+    <p>flip_num_rotations: <span id="flip_num_rotations"></span></p>
     <button
       id="start_demo"
       class="btn btn-lg btn-success py-1"
@@ -35,6 +50,6 @@
     >
       Start the demo
     </button>
-    <script src="js/flip.js" async defer></script>
+    <script src="js/flip.js" async defer type="module"></script>
   </body>
 </html>
