@@ -5,11 +5,12 @@ var flipping = false;
 var captureWindow = 11;
 var deltaThreshold = 7;
 var averageCurrentAcceleration = 0;
-var averageAccelerationThreshold = 3;
+var averageAccelerationThreshold = 5;
 var millisecondsStart = 0;
 var speedArray = [];
 var accelerationArray = [];
 var flipStartPointer = 0;
+var flipOnOff = [];
 
 function addOrientationToArray(event) {
   // console.log(event);
@@ -35,6 +36,9 @@ demo_button.onclick = function (e) {
   }
 
   if (is_running) {
+    flipOnOffString = flipOnOff.toString().replace(/,/g, " ");
+    document.getElementById("flip_on_off").innerHTML = flipOnOffString;
+    flipOnOff = [];
     window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener("devicemotion", handleMotion);
     demo_button.innerHTML = "Start demo";
@@ -85,6 +89,7 @@ function flip_or_no_flip() {
     ) {
       document.body.style.backgroundColor = "green";
 
+      flipOnOff.push(true);
       flipSlicedOrientationArray.push(slicedWindowedOrientation);
       flipDeltaArray.push(averageDeltas);
 
@@ -99,6 +104,7 @@ function flip_or_no_flip() {
 
       // not flipping
     } else {
+      flipOnOff.push(false);
       document.body.style.backgroundColor = "red";
 
       // if just stopped flipping
@@ -128,6 +134,7 @@ function flip_or_no_flip() {
         let millisecondsDifference = millisecondsStop - millisecondsStart;
         document.getElementById("flipping_time").innerHTML =
           millisecondsDifference;
+        millisecondsStart = 0;
 
         isFaceUp = getFaceUp(orientationArray[orientationArray.length - 1]);
         document.getElementById("flipping_faceup").innerHTML = isFaceUp;
