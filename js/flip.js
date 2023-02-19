@@ -8,6 +8,7 @@ var averageAccelThreshold = 5;
 var flipStartIndex = null;
 var flippingOrientationSlice = null;
 var flipTimeStart = null;
+var sampleRate = 60;
 
 function addOrientationToArray(event) {
   orientationArray.push({
@@ -15,6 +16,13 @@ function addOrientationToArray(event) {
     beta: event.beta,
     gamma: event.gamma,
   });
+}
+
+function stopRunning() {
+  window.removeEventListener("deviceorientation", handleOrientation);
+  window.removeEventListener("devicemotion", handleMotion);
+  demo_button.innerHTML = "Start demo";
+  is_running = false;
 }
 
 let is_running = false;
@@ -35,10 +43,7 @@ demo_button.onclick = function (e) {
     demo_button.innerHTML = "Start demo";
     is_running = false;
   } else {
-    window.addEventListener("devicemotion", handleMotion);
-    window.addEventListener("deviceorientation", handleOrientation);
-    document.getElementById("start_demo").innerHTML = "Stop demo";
-    is_running = true;
+    startRunning();
   }
 };
 
@@ -95,14 +100,11 @@ function stopFlip() {
 
   document.getElementById("flip_time").innerHTML = getFlipTime();
 
-  window.removeEventListener("deviceorientation", handleOrientation);
-  window.removeEventListener("devicemotion", handleMotion);
-  demo_button.innerHTML = "Start demo";
-  is_running = false;
+  stopRunning();
 }
 
 function getFlipTime() {
-  return flippingOrientationSlice.length / 55;
+  return flippingOrientationSlice.length / sampleRate;
 }
 
 function averageOrientation(array) {
