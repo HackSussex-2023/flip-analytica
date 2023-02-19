@@ -218,3 +218,32 @@ function handleMotion(event) {
       3;
   }
 }
+
+function getNumRotations() {
+  let angleSum = 0;
+  for (let i = 1; i < flippingOrientationSlice.length; i++) {
+    let from = flippingOrientationSlice[i - 1];
+
+    let fromRadA = (from.alpha * Math.PI) / 180;
+    let fromRadB = (from.beta * Math.PI) / 180;
+    let fromRadG = (from.gamma * Math.PI) / 180;
+
+    let fromEuler = new THREE.Euler(fromRadA, fromRadB, fromRadG, "XYZ");
+    let fromQuaternion = new THREE.Quaternion();
+    fromQuaternion.setFromEuler(fromEuler);
+
+    let to = flippingOrientationSlice[i];
+
+    let toRadA = (to.alpha * Math.PI) / 180;
+    let toRadB = (to.beta * Math.PI) / 180;
+    let toRadG = (to.gamma * Math.PI) / 180;
+
+    let toEuler = new THREE.Euler(toRadA, toRadB, toRadG, "XYZ");
+    let toQuaternion = new THREE.Quaternion();
+    toQuaternion.setFromEuler(toEuler);
+
+    angleSum += fromQuaternion.angleTo(toQuaternion);
+  }
+
+  return angleSum / (2 * Math.PI);
+}
