@@ -85,6 +85,12 @@ function averageOrientation() {
     sumGammaDeltas += element.gamma;
   });
 
+  deltaSumsArray.push({
+    alpha: sumAlphaDeltas,
+    beta: sumBetaDeltas,
+    gamma: sumGammaDeltas,
+  });
+
   let averageAlphaDeltas = sumAlphaDeltas / deltaArray.length;
   let averageBetaDeltas = sumBetaDeltas / deltaArray.length;
   let averageGammaDeltas = sumGammaDeltas / deltaArray.length;
@@ -95,7 +101,11 @@ function averageOrientation() {
 
   orientationArray = [];
   deltaArray = [];
+
+  return;
 }
+
+function getNumRotations() {}
 
 let is_running = false;
 let demo_button = document.getElementById("start_demo");
