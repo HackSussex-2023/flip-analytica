@@ -1,47 +1,131 @@
-function onClick() {
-  if (typeof DeviceMotionEvent.requestPermission === "function") {
-    // Handle iOS 13+ devices.
-    DeviceMotionEvent.requestPermission()
-      .then((state) => {
-        if (state === "granted") {
-          window.addEventListener("devicemotion", handleOrientation);
-        } else {
-          console.error("Request to access the orientation was rejected");
-        }
-      })
-      .catch(console.error);
-  } else {
-    // Handle regular non iOS 13+ devices.
-    window.addEventListener("devicemotion", handleOrientation);
-  }
-}
-
-window.addEventListener("deviceorientation", handleOrientation);
-
-calibratedDiv = document.getElementById("calibrated");
-posDiv = document.getElementById("pos");
-
-let initialRun = true;
-let calibratedAlpha;
-let calibratedBeta;
-let calibratedGamma;
-
 function handleOrientation(event) {
-  const alpha = event.alpha;
-  const beta = event.beta;
-  const gamma = event.gamma;
+  updateFieldIfNotNull("Orientation_a", event.alpha);
+  updateFieldIfNotNull("Orientation_b", event.beta);
+  updateFieldIfNotNull("Orientation_g", event.gamma);
+  addOrientationToArray(event);
+  incrementEventCount();
+}
 
-  if (initialRun) {
-    calibratedAlpha = alpha;
-    calibratedBeta = beta;
-    calibratedGamma = gamma;
-    initialRun = false;
+function incrementEventCount() {
+  let counterElement = document.getElementById("num-observed-events");
+  let eventCount = parseInt(counterElement.innerHTML);
+  counterElement.innerHTML = eventCount + 1;
+}
+
+function updateFieldIfNotNull(fieldName, value, precision = 10) {
+  if (value != null)
+    document.getElementById(fieldName).innerHTML = value.toFixed(precision);
+}
+
+function handleMotion(event) {
+  updateFieldIfNotNull(
+    "Accelerometer_gx",
+    event.accelerationIncludingGravity.x
+  );
+  updateFieldIfNotNull(
+    "Accelerometer_gy",
+    event.accelerationIncludingGravity.y
+  );
+  updateFieldIfNotNull(
+    "Accelerometer_gz",
+    event.accelerationIncludingGravity.z
+  );
+
+  updateFieldIfNotNull("Accelerometer_x", event.acceleration.x);
+  updateFieldIfNotNull("Accelerometer_y", event.acceleration.y);
+  updateFieldIfNotNull("Accelerometer_z", event.acceleration.z);
+
+  updateFieldIfNotNull("Accelerometer_i", event.interval, 2);
+
+  updateFieldIfNotNull("Gyroscope_z", event.rotationRate.alpha);
+  updateFieldIfNotNull("Gyroscope_x", event.rotationRate.beta);
+  updateFieldIfNotNull("Gyroscope_y", event.rotationRate.gamma);
+  incrementEventCount();
+}
+
+var orientationArray = [];
+
+function addOrientationToArray(event) {
+  // console.log(event);
+  orientationArray.push({
+    alpha: event.alpha,
+    beta: event.beta,
+    gamma: event.gamma,
+  });
+  // console.log(orientationArray);
+}
+
+function averageOrientation() {
+  let sumAlphaDeltas = 0;
+  let sumBetaDeltas = 0;
+  let sumGammaDeltas = 0;
+
+  let deltaArray = [];
+
+  for (let i = 1; i < orientationArray.length; i++) {
+    let deltaAlpha = Math.abs(
+      Math.abs(orientationArray[i].alpha) -
+        Math.abs(orientationArray[i - 1].alpha)
+    );
+    let deltaBeta = Math.abs(
+      Math.abs(orientationArray[i].beta) -
+        Math.abs(orientationArray[i - 1].beta)
+    );
+    let deltaGamma = Math.abs(
+      Math.abs(orientationArray[i].gamma) -
+        Math.abs(orientationArray[i - 1].gamma)
+    );
+
+    deltaArray.push({ alpha: deltaAlpha, beta: deltaBeta, gamma: deltaGamma });
   }
 
-  calibratedDiv.innerHTML = `<br/><br/><div>calibrated alpha: ${calibratedAlpha} calibrated beta: ${calibratedBeta} calibrated gamma: ${calibratedGamma}`;
-  posDiv.innerHTML = `alpha: ${alpha} beta: ${beta} gamma: ${gamma}</div><br/><br/><br/><div> cal alpha: ${
-    alpha - calibratedAlpha
-  } cal beta: ${beta - calibratedBeta} cal gamma: ${
-    gamma - calibratedGamma
-  }</div>`;
+  deltaArray.forEach((element) => {
+    sumAlphaDeltas += element.alpha;
+    sumBetaDeltas += element.beta;
+    sumGammaDeltas += element.gamma;
+  });
+
+  let averageAlphaDeltas = sumAlphaDeltas / deltaArray.length;
+  let averageBetaDeltas = sumBetaDeltas / deltaArray.length;
+  let averageGammaDeltas = sumGammaDeltas / deltaArray.length;
+
+  document.getElementById(
+    "orientation_average"
+  ).innerHTML = `${averageAlphaDeltas},${averageBetaDeltas},${averageGammaDeltas}`;
+
+  orientationArray = [];
+  deltaArray = [];
 }
+
+let is_running = false;
+let demo_button = document.getElementById("start_demo");
+demo_button.onclick = function (e) {
+  e.preventDefault();
+
+  // Request permission for iOS 13+ devices
+  if (
+    DeviceMotionEvent &&
+    typeof DeviceMotionEvent.requestPermission === "function"
+  ) {
+    DeviceMotionEvent.requestPermission();
+  }
+
+  if (is_running) {
+    averageOrientation();
+    window.removeEventListener("devicemotion", handleMotion);
+    window.removeEventListener("deviceorientation", handleOrientation);
+    demo_button.innerHTML = "Start demo";
+    demo_button.classList.add("btn-success");
+    demo_button.classList.remove("btn-danger");
+    is_running = false;
+  } else {
+    let counterElement = document.getElementById("num-observed-events");
+    counterElement.innerHTML = 0;
+    window.addEventListener("devicemotion", handleMotion);
+    window.addEventListener("deviceorientation", handleOrientation);
+    document.getElementById("start_demo").innerHTML = "Stop demo";
+    demo_button.classList.remove("btn-success");
+    demo_button.classList.add("btn-danger");
+    is_running = true;
+  }
+};

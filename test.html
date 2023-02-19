@@ -13,9 +13,76 @@
     <link rel="stylesheet" href="" />
   </head>
   <body>
-    <a onclick="onClick()">click me</a>
+    <!-- <div><button onclick="getGeoLocation()">click me for geo</button></div>
+    <div id="demo"></div>
     <div id="calibrated"></div>
-    <div id="pos"></div>
+    <div id="pos"></div> -->
+    <div class="p-3 mb-2 bg-secondary" id="demo-div">
+      <p style="margin-top: 1rem">
+        Num. of datapoints:
+        <span class="badge badge-warning" id="num-observed-events">0</span>
+      </p>
+
+      <h4 style="margin-top: 0.75rem">Orientation</h4>
+      <ul>
+        <li>X-axis (β): <span id="Orientation_b">0</span><span>°</span></li>
+        <li>Y-axis (γ): <span id="Orientation_g">0</span><span>°</span></li>
+        <li>Z-axis (α): <span id="Orientation_a">0</span><span>°</span></li>
+      </ul>
+
+      <h4>Accelerometer</h4>
+      <ul>
+        <li>
+          X-axis: <span id="Accelerometer_x">0</span
+          ><span> m/s<sup>2</sup></span>
+        </li>
+        <li>
+          Y-axis: <span id="Accelerometer_y">0</span
+          ><span> m/s<sup>2</sup></span>
+        </li>
+        <li>
+          Z-axis: <span id="Accelerometer_z">0</span
+          ><span> m/s<sup>2</sup></span>
+        </li>
+        <li>
+          Data Interval: <span id="Accelerometer_i">0</span><span> ms</span>
+        </li>
+      </ul>
+
+      <h4>Accelerometer including gravity</h4>
+
+      <ul>
+        <li>
+          X-axis: <span id="Accelerometer_gx">0</span
+          ><span> m/s<sup>2</sup></span>
+        </li>
+        <li>
+          Y-axis: <span id="Accelerometer_gy">0</span
+          ><span> m/s<sup>2</sup></span>
+        </li>
+        <li>
+          Z-axis: <span id="Accelerometer_gz">0</span
+          ><span> m/s<sup>2</sup></span>
+        </li>
+      </ul>
+
+      <h4>Gyroscope</h4>
+      <ul>
+        <li>X-axis: <span id="Gyroscope_x">0</span><span>°/s</span></li>
+        <li>Y-axis: <span id="Gyroscope_y">0</span><span>°/s</span></li>
+        <li>Z-axis: <span id="Gyroscope_z">0</span><span>°/s</span></li>
+      </ul>
+    </div>
+    <button
+      id="start_demo"
+      class="btn btn-lg btn-success py-1"
+      href="#"
+      role="button"
+      style="width: 100%; height: 100vh"
+    >
+      Start the demo
+    </button>
+    <div id="orientation_average"></div>
     <script src="js/script.js" async defer></script>
   </body>
 </html>
