@@ -1,10 +1,10 @@
 var orientationArray = [];
 var deltaTrackerArray = [];
 var flipping = false;
-var captureWindow = 11;
+var captureWindow = 16;
 var deltaThreshold = 8;
 var averageAccel = 0.1;
-var averageAccelThreshold = 3;
+var averageAccelThreshold = 5;
 var flipStartIndex = null;
 var flippingOrientationSlice = null;
 var flipTimeStart = null;
@@ -91,24 +91,24 @@ function flip_or_no_flip() {
 
 function startFlip() {
   flipStartIndex = orientationArray.length;
-  flipTimeStart = new Date().getTime();
 }
 
 function stopFlip() {
   flippingOrientationSlice = orientationArray.slice(flipStartIndex, -1);
-  let flipTimeEnd = new Date().getTime();
-  let flipTime =
-    parseInt(String(flipTimeEnd)) - parseInt(String(flipTimeStart));
-
-  document.getElementById("flip_start").innerHTML = flipStartIndex;
-  document.getElementById("flip_end").innerHTML = orientationArray.length;
-  document.getElementById("flip_time").innerHTML = flipTime;
-
-  flipTimeEnd = 0;
-  flipTimeStart = 0;
 
   document.getElementById("flip_length").innerHTML =
     flippingOrientationSlice.length;
+
+  document.getElementById("flip_time").innerHTML = getFlipTime();
+
+  window.removeEventListener("deviceorientation", handleOrientation);
+  window.removeEventListener("devicemotion", handleMotion);
+  demo_button.innerHTML = "Start demo";
+  is_running = false;
+}
+
+function getFlipTime() {
+  return flippingOrientationSlice.length / 55;
 }
 
 function averageOrientation(array) {
