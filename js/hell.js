@@ -16,6 +16,60 @@ var flippingDeltaSlice = [];
 var flipTimeStart = null;
 var sampleRate = 60;
 
+var tMin = 0.2;
+var tMax = 1.6;
+
+var sMin = 250;
+var sMax = 2400;
+
+var rMin = 0.2;
+var rMax = 7.0;
+
+var currentChallenge = 0;
+var challengeTarget = null;
+var challengeText = "";
+
+var completed = false;
+var score = 0;
+var lives = 3;
+
+var gameOver = false;
+
+generateChallenge();
+document.getElementById("challenge").innerHTML = challengeText;
+
+function generateChallenge() {
+  currentChallenge = (Math.random() * (2 - 0 + 1)) << 0;
+  console.log(currentChallenge);
+  if (currentChallenge == 0) {
+    challengeTarget = (Math.random() * (tMax - tMin) + tMin).toFixed(2);
+    challengeText = "Land a " + challengeTarget + "-second flip";
+  } else if (currentChallenge == 1) {
+    challengeTarget = (Math.random() * (sMax - sMin) + sMin).toFixed(2);
+    challengeText = "Hit a max speed of " + challengeTarget;
+  } else if (currentChallenge == 2) {
+    challengeTarget = (Math.random() * (rMax - rMin) + rMin).toFixed(2);
+    challengeText = "Hit " + challengeTarget + " rotations in one flip";
+  }
+}
+
+function challengeJudge(airTime, speed, rotations) {
+  if (currentChallenge == 0) {
+    if (airTime >= challengeTarget) {
+      return true;
+    }
+  } else if (currentChallenge == 1) {
+    if (speed >= challengeTarget) {
+      return true;
+    }
+  } else if (currentChallenge == 2) {
+    if (rotations >= challengeTarget) {
+      return true;
+    }
+    return false;
+  }
+}
+
 function resetVariables() {
   orientationArray = [];
   speedArray = [];
@@ -48,11 +102,11 @@ demo_button.onclick = function (e) {
     DeviceMotionEvent.requestPermission();
   }
 
-  if (is_running) {
+  if (is_running && !gameOver) {
     window.removeEventListener("devicemotion", handleMotion);
     demo_button.innerHTML = "BEGIN";
     is_running = false;
-  } else {
+  } else if (!is_running && !gameOver) {
     window.addEventListener("devicemotion", handleMotion);
     window.addEventListener("deviceorientation", handleOrientation);
     document.getElementById("start_demo").innerHTML = "STOP";
@@ -100,6 +154,25 @@ function flip_or_no_flip() {
   }
 }
 
+function results(result) {
+  if (result) {
+    score += 100;
+    document.getElementById("score").innerHTML = score;
+  } else if (result == false) {
+    lives--;
+    document.getElementById("lives").innerHTML = lives;
+  }
+
+  if (lives == 0) {
+    alert("GAME OVER");
+    gameOver = true;
+    document.getElementById("stuff").innerHTML = "GAME OVER";
+  } else {
+    generateChallenge();
+    document.getElementById("challenge").innerHTML = challengeText;
+  }
+}
+
 function startFlip() {
   flipStartIndex = orientationArray.length;
 }
@@ -120,7 +193,10 @@ function stopFlip() {
   demo_button.innerHTML = "BEGIN";
   is_running = false;
 
+  completed = challengeJudge(getFlipTime(), getMaxSpeed(), getNumRotations());
+  results(completed);
   resetVariables();
+  completed = false;
 }
 
 function getMaxSpeed() {
@@ -186,11 +262,6 @@ function averageOrientation(array) {
     averageBetaDeltas: averageBetaDeltas,
     averageGammaDeltas: averageGammaDeltas,
   };
-}
-
-function updateFieldIfNotNull(fieldName, value, precision = 10) {
-  if (value != null)
-    document.getElementById(fieldName).innerHTML = value.toFixed(precision);
 }
 
 function handleMotion(event) {
