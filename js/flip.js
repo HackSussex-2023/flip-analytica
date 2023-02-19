@@ -7,13 +7,11 @@ var averageSpeed = 0.1;
 var averageSpeedThreshold = 3;
 
 function addOrientationToArray(event) {
-  // console.log(event);
   orientationArray.push({
     alpha: event.alpha,
     beta: event.beta,
     gamma: event.gamma,
   });
-  // console.log(orientationArray);
 }
 
 let is_running = false;
@@ -31,21 +29,18 @@ demo_button.onclick = function (e) {
 
   if (is_running) {
     averageDeltas = averageOrientation(orientationArray);
+
     document.getElementById(
       "orientation_average"
     ).innerHTML = `${averageDeltas.averageAlphaDeltas},${averageDeltas.averageBetaDeltas},${averageDeltas.averageGammaDeltas}`;
     window.removeEventListener("deviceorientation", handleOrientation);
     window.removeEventListener("devicemotion", handleMotion);
     demo_button.innerHTML = "Start demo";
-    demo_button.classList.add("btn-success");
-    demo_button.classList.remove("btn-danger");
     is_running = false;
   } else {
     window.addEventListener("devicemotion", handleMotion);
     window.addEventListener("deviceorientation", handleOrientation);
     document.getElementById("start_demo").innerHTML = "Stop demo";
-    demo_button.classList.remove("btn-success");
-    demo_button.classList.add("btn-danger");
     is_running = true;
   }
 };
